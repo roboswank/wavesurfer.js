@@ -540,7 +540,7 @@ export default class WaveSurfer extends util.Observer {
         }
 
         this.drawer.on('redraw', () => {
-            this.drawBuffer();
+            this.drawBuffer(true);
             this.drawer.progress(this.backend.getPlayedPercents());
         });
 
@@ -633,7 +633,7 @@ export default class WaveSurfer extends util.Observer {
      * seconds, 60 means 1 minute
      */
     setCurrentTime(seconds) {
-        if (this.getDuration() >= seconds) {
+        if (seconds >= this.getDuration()) {
             this.seekTo(1);
         } else {
             this.seekTo(seconds / this.getDuration());
@@ -1009,9 +1009,10 @@ export default class WaveSurfer extends util.Observer {
      * Get the correct peaks for current wave viewport and render wave
      *
      * @private
+     * @param {boolean} resized Canvas resized
      * @emits WaveSurfer#redraw
      */
-    drawBuffer() {
+    drawBuffer(resized) {
         const nominalWidth = Math.round(
             this.getDuration() *
                 this.params.minPxPerSec *
@@ -1019,7 +1020,7 @@ export default class WaveSurfer extends util.Observer {
         );
         const parentWidth = this.drawer.getWidth();
         let width = nominalWidth;
-        let start = this.drawer.getScrollX();
+        let start = resized ? 0 : this.drawer.getScrollX();
         let end = Math.max(start + parentWidth, width);
         // Fill container
         if (
